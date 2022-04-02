@@ -2,42 +2,22 @@
 
 **fuzzy-neon:** Collection of fuzzy string matching algorithms written in rust
 
-This project was bootstrapped by [create-neon](https://www.npmjs.com/package/create-neon).
+Created using [neon](https://neon-bindings.com/).
 
-## Installing fuzzy-neon
-
-Installing fuzzy-neon requires a [supported version of Node and Rust](https://github.com/neon-bindings/neon#platform-support).
-
-You can install the project with npm. In the project directory, run:
-
+## Installation
+**Node**
 ```sh
-$ npm install
+$ npm i fuzzy-neon
 ```
 
-This fully installs the project, including installing any dependencies and running the build.
-
-## Building fuzzy-neon
-
-If you have already installed the project and only want to run the build, run:
-
-```sh
-$ npm run build
+## Usage
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.hamming('nick', 'nice');
+console.log(score);
+// 1
 ```
-
-This command uses the [cargo-cp-artifact](https://github.com/neon-bindings/cargo-cp-artifact) utility to run the Rust build and copy the built library into `./index.node`.
-
-## Exploring fuzzy-neon
-
-After building fuzzy-neon, you can explore its exports at the Node REPL:
-
-```sh
-$ npm install
-$ node
-> require('.').hamming('hi', 'hello')
-4
-```
-
-## Available Approximate (Fuzzy) string matching algorithms
+## Available String Matching Metrics
  * Hamming distance `hamming(str1, str2)`
  * Levenshtein (recursive impl) `levenshtein(str1, str2)`
  * Wagner-Fischer (dynamic programming impl of levenshtein) `wagnerFischer(str1, str2)`
@@ -47,11 +27,69 @@ $ node
  * n-gram based distance metric `ngram(str1, str2, ngramSize)`
  * Jensen-Shannon Vector Distance `jensonshannonVector(str1, str2)`
 
-
-## Learn More
-
-To learn more about Neon, see the [Neon documentation](https://neon-bindings.com).
-
-To learn more about Rust, see the [Rust documentation](https://www.rust-lang.org).
-
-To learn more about Node, see the [Node documentation](https://nodejs.org).
+## Algorithm Explanation/Useful Links
+#### Hamming
+Computes number of positions between two strings where characters differ.
+Expanded to allow strings of different lengths
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.hamming('nick', 'nice');
+console.log(score);
+// 1
+```
+#### Levenshtein
+The Levenshtein distance between two strings is the minimum number of single-character edits (insertions, deletions or substitutions) to convert one word to the other. For efficient implementation **use Wagner-Fischer**
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.levenshtein('nick', 'nit');
+console.log(score);
+// 2
+```
+#### Wagner-Fischer
+Implementation of Levenshtein using a faster, dynamic programming implementation - interesting to compare performance between the two.
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.wagnerFischer('nick', 'nit');
+console.log(score);
+// 2
+```
+#### Damerau-Levenshtein
+Extension of the Levenshtein distance metric which allows for adjacent character transpositions
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.damerauLevenshtein('taco', 'atco');
+console.log(score);
+// 1
+```
+#### Jaro Winkler Distance
+Extension of the Jaro distance between two strings; the Jaro distance uses the relative probability of each character in a string to calculate an edit score between two strings (see (here)[https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance] for formula details). Winkler extended this to boost the scores of words which shared prefixes of some length. Returns a normalised score between 0 and 1.
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.jaroWinkler('nice', 'nick');
+console.log(score);
+// 0.11549999999999994
+```
+#### N-gram Based distance metric
+n-gram based string distance metric implemented based on the work from (this paper)[http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf].
+Extremely good at integrating context into producing the metric score, O(n^2) complexity.
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.ngram('rupert', 'robert', 2); // last arg is size of ngram
+console.log(score);
+// 0.16666666666666666
+```
+### Jensen Shannon Distance
+Computes the relatively probability of events in the string (events being either single characters or bi-grams) porducing a probabilty vector. Then computes the Jensen Shannon distance metric over the two probability vectors. Produced from the work by Richard Connor et al in (this paper)[https://scholar.google.co.uk/citations?view_op=view_citation&hl=en&user=wtJy4BEAAAAJ&sortby=pubdate&citation_for_view=wtJy4BEAAAAJ:EYYDruWGBe4C]. O(n) complexity.
+**Example**
+```js
+const fuzzy = require('fuzzy-neon');
+let score = fuzzy.jensonshannonVector('hi their', 'hi there');
+console.log(score);
+// 0.36638698518165513
+```
