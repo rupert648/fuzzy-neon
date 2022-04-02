@@ -66,7 +66,7 @@ console.log(score);
 // 1
 ```
 #### Jaro Winkler Distance
-Extension of the Jaro distance between two strings; the Jaro distance uses the relative probability of each character in a string to calculate an edit score between two strings (see (here)[https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance] for formula details). Winkler extended this to boost the scores of words which shared prefixes of some length. Returns a normalised score between 0 and 1.
+Extension of the Jaro distance between two strings; the Jaro distance uses the relative probability of each character in a string to calculate an edit score between two strings (see [here](https://en.wikipedia.org/wiki/Jaro%E2%80%93Winkler_distance) for formula details). Winkler extended this to boost the scores of words which shared prefixes of some length. Returns a normalised score between 0 and 1.
 **Example**
 ```js
 const fuzzy = require('fuzzy-neon');
@@ -75,7 +75,7 @@ console.log(score);
 // 0.11549999999999994
 ```
 #### N-gram Based distance metric
-n-gram based string distance metric implemented based on the work from (this paper)[http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf].
+n-gram based string distance metric implemented based on the work from [this paper](http://webdocs.cs.ualberta.ca/~kondrak/papers/spire05.pdf).
 Extremely good at integrating context into producing the metric score, O(n^2) complexity.
 **Example**
 ```js
@@ -85,7 +85,7 @@ console.log(score);
 // 0.16666666666666666
 ```
 ### Jensen Shannon Distance
-Computes the relatively probability of events in the string (events being either single characters or bi-grams) porducing a probabilty vector. Then computes the Jensen Shannon distance metric over the two probability vectors. Produced from the work by Richard Connor et al in (this paper)[https://scholar.google.co.uk/citations?view_op=view_citation&hl=en&user=wtJy4BEAAAAJ&sortby=pubdate&citation_for_view=wtJy4BEAAAAJ:EYYDruWGBe4C]. O(n) complexity.
+Computes the relatively probability of events in the string (events being either single characters or bi-grams) porducing a probabilty vector. Then computes the Jensen Shannon distance metric over the two probability vectors. Produced from the work by Richard Connor et al in [this paper](https://scholar.google.co.uk/citations?view_op=view_citation&hl=en&user=wtJy4BEAAAAJ&sortby=pubdate&citation_for_view=wtJy4BEAAAAJ:EYYDruWGBe4C). O(n) complexity.
 **Example**
 ```js
 const fuzzy = require('fuzzy-neon');
