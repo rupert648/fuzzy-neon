@@ -9,6 +9,10 @@ Created using [neon](https://neon-bindings.com/).
 ```sh
 $ npm i fuzzy-neon
 ```
+In order to compile fuzzy-neon you may need to first install `cargo-cp-artifact`. This can be done via the following command
+```sh
+$ npm i cargo-cp-artifcat
+```
 
 ## Usage
 ```js
