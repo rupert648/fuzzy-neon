@@ -5,15 +5,17 @@
 Created using [neon](https://neon-bindings.com/).
 
 ## Installation
+Requires `Node` and `Cargo` to install.
+
 **Node**
-```sh
-$ npm i fuzzy-neon
-```
-In order to compile fuzzy-neon you may need to first install `cargo-cp-artifact`. This can be done via the following command
+In order to install fuzzy-neon you may need to first install `cargo-cp-artifact`:
 ```sh
 $ npm i cargo-cp-artifcat
 ```
-
+Installing the Module
+```sh
+$ npm i fuzzy-neon
+```
 ## Usage
 ```js
 const fuzzy = require('fuzzy-neon');
