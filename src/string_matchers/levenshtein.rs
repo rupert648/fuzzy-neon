@@ -24,11 +24,11 @@ fn leven_recursive(str1: &str, str2: &str, m: usize, n: usize) -> i32 {
     }
 
     // try 3 operations: insert, remove and replace
-    return 1 + min_of_3(
+    1 + min_of_3(
         leven_recursive(str1, str2, m, n - 1),  // insert
         leven_recursive(str1, str2, m - 1, n),  // remove
         leven_recursive(str1, str2, m - 1, n - 1)  // replace
-    ) as i32;
+    ) as i32
 }
 
 fn min_of_3(x: i32, y: i32, z: i32) -> i32 {
@@ -39,5 +39,5 @@ fn min_of_3(x: i32, y: i32, z: i32) -> i32 {
         return y;
     }
 
-    return z;
+    z
 }

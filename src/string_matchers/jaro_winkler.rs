@@ -1,7 +1,7 @@
 use std::cmp;
 
 pub fn compute(str1: &str, str2: &str) -> f64 {
-    if str1 == "" || str2 == "" { return 0.0 }
+    if str1.is_empty() || str2.is_empty() { return 0.0 }
 
     if str1 == str2 { return 1.0 }
 
@@ -45,7 +45,7 @@ pub fn compute(str1: &str, str2: &str) -> f64 {
         return 0.0;
     }
 
-    transpositions = transpositions / 2;
+    transpositions /= 2;
 
     let score: f64 = 0.334 * (
         ((matches as f64) / (longer.len() as f64))
@@ -56,6 +56,5 @@ pub fn compute(str1: &str, str2: &str) -> f64 {
     if score < 0.7 { return score; }
 
     // we already have a good match, hence we boost the score proportional to the common prefix
-    let boosted_score = score + (prefix_match as f64) * 0.1 * (1.0 - score);
-    boosted_score
+    score + (prefix_match as f64) * 0.1 * (1.0 - score)
 }

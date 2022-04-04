@@ -3,7 +3,7 @@ use std::cmp;
 
 pub fn compute(str1: &str, str2: &str) -> i32 {
     // 2d array
-    let mut d = Array2D::filled_with(0 as i32, str1.len()+1, str2.len()+1);
+    let mut d = Array2D::filled_with(0_i32, str1.len()+1, str2.len()+1);
 
     for i in 1..str1.len()+1 {
         d[(i, 0)] = i as i32;

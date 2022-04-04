@@ -7,7 +7,7 @@ pub fn compute(str1: &str, str2: &str) -> i32 {
     let p = str1.len();
     let q = str2.len();
 
-    let mut table = Array2D::filled_with(0 as i32, p+1, q+1);
+    let mut table = Array2D::filled_with(0_i32, p+1, q+1);
 
     for i in 0..p+1 {
         for j in 0..q+1 {

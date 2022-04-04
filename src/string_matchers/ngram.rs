@@ -23,39 +23,37 @@ pub fn compute(source: &str, target: &str, ngram_size: i32) -> f64 {
     let n = ngram_size as usize;
     let sa_length = source_len + n - 1;
     let mut sa = vec![special; sa_length];
-    let mut p: Vec<f64>;
-    let mut d: Vec<f64>;
     let mut _swapper: Vec<f64> = Vec::new();
 
     // construct sa
-    for i in 0..sa.len() {
+    for (i, item) in sa.iter_mut().enumerate() {
         if i < n - 1 {
-            sa[i] = special;    // prefix
+            *item = special;    // prefix
         } else {
             let value = (i as i32) - (n as i32) + 1;
             let source_char = source.chars().nth(value as usize).unwrap();
-            sa[i] = source_char;
+            *item = source_char;
         }
     }
 
-    p = vec![0.0; source_len+1];
-    d = vec![0.0; source_len+1];
+    let mut p: Vec<f64> = vec![0.0; source_len+1];
+    let mut d: Vec<f64> = vec![0.0; source_len+1];
 
     // jth ngram of target
     let mut t_j = vec![special; n];
 
-    for i in 0..source_len+1 {
-        p[i] = i as f64;
+    for (i, item) in p.iter_mut().enumerate().take(source_len+1){
+        *item = i as f64;
     }
 
     for j in 1..target_len+1 {
         if j < n {
-            for ti in 0..(n-j) {
-                t_j[ti] = special;
+            for item in t_j.iter_mut().take(n-j) {
+                *item = special;
             }
-            for ti in (n-j)..n {
+            for (ti, item) in t_j.iter_mut().enumerate().take(n).skip(n-j) {
                 let target_char = target.chars().nth(ti-(n-j)).unwrap();
-                t_j[ti] = target_char;
+                *item = target_char;
             }
         } else {
             t_j = target[(j-n)..j].chars().collect();
@@ -87,13 +85,13 @@ pub fn compute(source: &str, target: &str, ngram_size: i32) -> f64 {
         d = _swapper;
     }
 
-    return p[source_len] / cmp::max(target_len, source_len) as f64;
+    p[source_len] / cmp::max(target_len, source_len) as f64
 }
 
 fn min_f64(x: f64, y: f64) -> f64 {
     if x < y {
-        return x;
+        x
     } else {
-        return y;
+        y
     }
 }

@@ -19,8 +19,8 @@ pub fn compute(str1: &str, str2: &str) -> i32 {
     let max_dist = str1_len + str2_len;
     dist[0][0] = max_dist as i32;
 
-    for i in 0..str1_len+1 {
-        dist[i][0] = i as i32;
+    for (i, item) in dist.iter_mut().enumerate().take(str1_len+1) {
+        item[0] = i as i32;
     }
     for j in 0..str2_len+1 {
         dist[0][j] = j as i32;
@@ -62,5 +62,5 @@ fn min_of_3(x: i32, y: i32, z: i32) -> i32 {
         return y;
     }
 
-    return z;
+    z
 }

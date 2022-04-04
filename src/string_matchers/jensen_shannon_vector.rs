@@ -1,5 +1,5 @@
 use core::panic;
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, cmp::Ordering};
 
 // data structures
 struct SparseProbabilityArray {
@@ -27,24 +27,20 @@ fn build_empty_sparse_probability_array() -> SparseProbabilityArray {
 }
 
 fn spa_add_event(event: i32, card: i32, spa_instance: &mut SparseProbabilityArray ) {
-    if !spa_instance.card_map.contains_key(&event) {
-        spa_instance.card_map.insert(event.clone(), 0);
-    }
+    // insert new card entry if needed
+    spa_instance.card_map.entry(event).or_insert(0);
 
-    spa_instance.card_map.insert(event.clone(), spa_instance.card_map.get(&event).unwrap() + card);
+    spa_instance.card_map.insert(event, spa_instance.card_map.get(&event).unwrap() + card);
     spa_instance.acc += card;
 }
 
 fn spa_finalise(spa_instance: &mut SparseProbabilityArray) {
 
-    let mut pointer = 0;
-    for (event, value) in &spa_instance.card_map {
-        let calc = (value.clone() as f64) / (spa_instance.acc as f64);
+    for (pointer, (event, value)) in spa_instance.card_map.iter().enumerate() {
+        let calc = (*value as f64) / (spa_instance.acc as f64);
 
-        spa_instance.final_events.insert(pointer, event.clone());
+        spa_instance.final_events.insert(pointer, *event);
         spa_instance.final_probs.insert(pointer, calc);
-
-        pointer += 1;
     }
 
     // reset tree
@@ -56,18 +52,15 @@ fn string_to_sparse_array(s: &str, js_instance: &JS) -> SparseProbabilityArray {
     let mut spa = build_empty_sparse_probability_array();
 
     let mut ch1: char = '\0';
-    let mut ch2: char = s.chars().nth(0).unwrap();
+    let mut ch2: char = s.chars().next().unwrap();
     spa_add_event((ch1 as i32) * js_instance.char_val_upb + (ch2 as i32), 2, &mut spa);
 
     for i in 0..(s.len() as i32) {
-        ch1 = match s.chars().nth(i as usize) {
-            Some(c) => c,
-            None => {
-                // should never get here but somehow sometimes do ??
-                // return generic space character to not break alg
-                ' '
-            }
-        };
+        ch1 = s.chars().nth(i as usize).unwrap_or({
+            // should never get here but somehow sometimes do ??
+            // return generic space character to not break alg
+            ' '
+        });
         spa_add_event(ch1 as i32, 2, &mut spa);
         if (ch1 as i32) > js_instance.char_val_upb || ch1 == '\0' {
             panic!();
@@ -77,10 +70,7 @@ fn string_to_sparse_array(s: &str, js_instance: &JS) -> SparseProbabilityArray {
             // if ch2 (i + 1) is out of bounds
             ch2 = '\0';
         } else {
-            ch2 = match s.chars().nth((i as usize)+1) {
-                Some(c) => c,
-                None => '\0'
-            }
+            ch2 = s.chars().nth((i as usize)+1).unwrap_or('\0');
         }
 
         spa_add_event((ch1 as i32) * js_instance.char_val_upb + (ch2 as i32), 1, &mut spa);
@@ -118,14 +108,14 @@ fn distance(ar1: SparseProbabilityArray, ar2: SparseProbabilityArray) -> f64 {
     let mut sim_acc = 0.0;
 
     while !finished {
-        if ar1_event == ar2_event {
-            sim_acc += h_calc(&ar1.final_probs[ar1_ptr], &ar2.final_probs[ar2_ptr]);
-            ar1_ptr += 1;
-            ar2_ptr += 1;
-        } else if ar1_event < ar2_event {
-            ar1_ptr += 1;
-        } else {
-            ar2_ptr += 1;
+        match ar1_event.cmp(&ar2_event) {
+            Ordering::Equal => {
+                sim_acc += h_calc(&ar1.final_probs[ar1_ptr], &ar2.final_probs[ar2_ptr]);
+                ar1_ptr += 1;
+                ar2_ptr += 1;
+            },
+            Ordering::Less =>  ar1_ptr += 1,
+            Ordering::Greater => ar2_ptr += 1
         }
 
         if ar1_ptr == ar1.final_events.len() {
@@ -146,14 +136,14 @@ fn distance(ar1: SparseProbabilityArray, ar2: SparseProbabilityArray) -> f64 {
             (ar2_ptr == ar2.final_events.len());
     }
 
-    let ln_of_2: f64 = (2.0 as f64).ln();
+    let ln_of_2: f64 = (2.0_f64).ln();
     let k: f64 = f64_max(0.0, 1.0 - (sim_acc / ln_of_2) / 2.0);
 
     k.sqrt()
 }
  
 pub fn compute(str1: &str, str2: &str) -> f64 {
-    if str1 == "" || str2 == "" { return 0.0 }
+    if str1.is_empty() || str2.is_empty() { return 0.0 }
 
     let sed = build_js(255);
     let s1 = string_to_sparse_array(str1, &sed);
