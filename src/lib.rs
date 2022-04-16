@@ -17,6 +17,34 @@ use crate::string_matchers::{
 
 mod string_matchers;
 
+/// Given two strings, will comppute the hamming distance between them
+/// 
+/// Given two strings, computes the distance between them using Jensen-Shannon Distance over strings.
+/// Third argument is a boolean, where `true` means that the casing of the strings will be ignored
+/// Function Example:
+/// ```js
+/// const fuzzy = require('fuzzy-neon');
+/// let score = fuzzy.distance('nick', 'nice', true);
+/// console.log(score);
+/// ```
+pub fn distance(mut cx: FunctionContext) -> JsResult<JsNumber> {
+    let string1_handle = cx.argument::<JsString>(0)?;
+    let string2_handle = cx.argument::<JsString>(0)?;
+    let boolean_handle = cx.argument::<JsBoolean>(0)?;
+
+    let string1 = string1_handle.value(&mut cx);
+    let string2 = string2_handle.value(&mut cx);
+    let ignore_case = boolean_handle.value(&mut cx);
+
+    let result: f64 = if ignore_case {
+        jensen_shannon_vector::compute(&string1.to_lowercase(), &string2.to_lowercase())
+    } else {
+        jensen_shannon_vector::compute(&string1, &string2)
+    };
+
+    Ok(cx.number(result))
+}
+
 
 /// Given two strings, will compute the hamming distance between them
 /// 
@@ -155,6 +183,7 @@ pub fn jenson_shannon_vector(mut cx: FunctionContext) -> JsResult<JsNumber> {
 
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
+    cx.export_function("distance", distance)?;
     cx.export_function("hamming", hamming)?;
     cx.export_function("levenshtein", levenshtein)?;
     cx.export_function("wagnerFischer", wagner_fischer)?;
